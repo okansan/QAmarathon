@@ -2,17 +2,17 @@ const express = require("express");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 
-const port = 自分の社員番号;
+const port = 3321;
 
 const cors = require("cors");
 app.use(cors());
 
 const { Pool } = require("pg");
 const pool = new Pool({
-  user: "x", // PostgreSQLのユーザー名に置き換えてください
-  host: "localhost",
-  database: "x", // PostgreSQLのデータベース名に置き換えてください
-  password: "x", // PostgreSQLのパスワードに置き換えてください
+  user: "user_3321", // PostgreSQLのユーザー名に置き換えてください
+  host: "db",
+  database: "crm_3321", // PostgreSQLのデータベース名に置き換えてください
+  password: "pass_3321", // PostgreSQLのパスワードに置き換えてください
   port: 5432,
 });
 
@@ -20,10 +20,11 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-app.get("/customers", async (req, res) => {
+app.get("/customer/list.html", async (req, res) => {
   try {
     const customerData = await pool.query("SELECT * FROM customers");
-    res.send(customerData.rows);
+    res.setHeader('Content-Type','application/json');
+    res.send(JSON.stringify(customerData.rows));
   } catch (err) {
     console.error(err);
     res.send("Error " + err);
@@ -37,7 +38,7 @@ app.post("/add-customer", async (req, res) => {
   try {
     const { companyName, industry, contact, location } = req.body;
     const newCustomer = await pool.query(
-      "INSERT INTO customers (company_nam, industry, contact, location) VALUES ($1, $2, $3, $4) RETURNING *",
+      "INSERT INTO customers (company_name, industry, contact, location) VALUES ($1, $2, $3, $4) RETURNING *",
       [companyName, industry, contact, location]
     );
     res.json({ success: true, customer: newCustomer.rows[0] });
@@ -46,5 +47,67 @@ app.post("/add-customer", async (req, res) => {
     res.json({ success: false });
   }
 });
+
+app.get("/customer/detail.html", async (req, res) => {
+  try {
+    const customerId = req.query.customer_id; // クエリパラメータから customer_id を取得
+
+    const customerData = await pool.query("SELECT * FROM customers WHERE customer_id = $1", [customerId]);
+    
+    if (customerData.rows.length > 0) {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(customerData.rows[0]));
+    } else {
+      res.status(404).send('Customer not found');
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
+
+app.delete("/customer/delete/:customer_id", async (req, res) => {
+  try {
+    const customerId = req.params.customer_id;
+
+    const result = await pool.query("DELETE FROM customers WHERE customer_id = $1 RETURNING *", [customerId]);
+
+    if (result.rows.length > 0) {
+      res.json({ success: true });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, error: err.message });
+  }
+});
+
+
+app.put("/customer/update/:customer_id", async (req, res) => {
+  try {
+      const customerId = req.params.customer_id;
+      const { companyName, industry, contact, location } = req.body;
+
+      const result = await pool.query(
+          "UPDATE customers SET company_name = $1, industry = $2, contact = $3, location = $4 WHERE customer_id = $5 RETURNING *",
+          [companyName, industry, contact, location, customerId]
+      );
+
+      if (result.rows.length > 0) {
+          res.json({ success: true });
+      } else {
+          res.json({ success: false });
+      }
+  } catch (err) {
+      console.error(err);
+      res.json({ success: false, error: err.message });
+  }
+});
+
+
+
+
 
 app.use(express.static("public"));

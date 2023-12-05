@@ -1,0 +1,169 @@
+<!-- customer-detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Detail</title>
+    <!-- Bootstrap CSSの読み込み -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">顧客情報詳細</h1>
+        <div>
+          <strong>Company Name:</strong> <span id="companyName"></span>
+        </div>
+        <div>
+          <strong>Industry:</strong> <span id="industry"></span>
+        </div>
+        <div>
+          <strong>Contact:</strong> <span id="contact"></span>
+        </div>
+        <div>
+          <strong>Location:</strong> <span id="location"></span>
+        </div>
+          <button class="btn btn-danger mt-3" id="deleteButton">Delete</button>
+          <button class="btn btn-primary mt-3" id="editButton">Edit</button>
+
+          <!-- ここ追加した更新用のフォーム -->
+        <div id="editForm" style="display: none;">
+          <form id="updateForm">
+              <label for="updateCompanyName">Company Name:</label>
+              <input type="text" id="updateCompanyName" name="companyName">
+
+              <label for="updateIndustry">industry:</label>
+              <input type="text" id="updateIndustry" name="industry">
+
+              <label for="updateContact">Contact:</label>
+              <input type="text" id="updateContact" name="contact">
+
+              <label for="updateLocation">Location:</label>
+              <input type="text" id="updateLocation" name="location">
+
+              <button type="button" id="updateButton">Update</button>
+            </form>
+          </div>
+        </div>
+ 
+    <section  class="text-center">
+
+    <!-- BootstrapのJavaScriptの読み込み -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script type="module">
+        import config from "../../config.js";
+
+        const apiUrl = "http://localhost:3321";
+      
+        // URLからクエリパラメータを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const customerId = urlParams.get('customer_id');
+
+
+        fetch(`${apiUrl}/customer/detail.html?customer_id=${customerId}`)
+            .then((response) => response.json())
+            .then((customer) => {
+             // 取得したデータを表示
+            document.getElementById('companyName').textContent = customer.company_name;
+            document.getElementById('industry').textContent = customer.industry;
+            document.getElementById('contact').textContent = customer.contact;
+            document.getElementById('location').textContent = customer.location;
+                    
+
+            // 削除ボタンのクリックイベント
+            document.getElementById('deleteButton').addEventListener('click', () => {
+             // 確認ダイアログを表示
+            const isConfirmed = confirm('削除していいですか？');
+            if (isConfirmed) {
+            // バックエンドに削除リクエストを送信
+            fetch(`${apiUrl}/customer/delete/${customerId}`, {
+              method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success === true) {
+                // 削除が成功した場合、リストページにリダイレクト
+                window.location.href = `http://localhost/customer/list.html`;
+              } else {
+                alert('削除に失敗しました');
+              }
+            })
+            .catch(error => console.error('Error:', error));
+
+        
+            }
+          })
+    // 編集ボタンのクリックイベント
+    document.getElementById('editButton').addEventListener('click', () => {
+      // 編集フォームを表示
+      document.getElementById('editForm').style.display = 'block';
+        
+
+    // 表示を切り替え
+    document.getElementById('companyName').style.display = 'none';
+    document.getElementById('industry').style.display = 'none';
+    document.getElementById('contact').style.display = 'none';
+    document.getElementById('location').style.display = 'none';
+});
+
+// 顧客データを取得して表示
+ fetch(`${apiUrl}/customer/detail.html?customerId=${customerId}`)
+//fetch(`${apiUrl}/customer/${customerId}`)
+
+    .then((response) => response.json())
+    .then((customer) => {
+
+     // フォームに初期データをセット
+     document.getElementById('updateCompanyName').value = customer.company_name;
+     document.getElementById('updateIndustry').value = customer.industry;
+     document.getElementById('updateContact').value = customer.contact;
+     document.getElementById('updateLocation').value = customer.location; 
+     })
+   .catch((error) => console.error(error));
+          
+  // 更新ボタンの取得
+const updateButton = document.getElementById('updateButton');
+
+// 更新ボタンのクリックイベント
+updateButton.addEventListener('click', () => {
+
+// 更新処理...
+const updatedCustomer = {
+    companyName: document.getElementById('updateCompanyName').value,
+    industry: document.getElementById('updateIndustry').value,
+    contact: document.getElementById('updateContact').value,
+    location: document.getElementById('updateLocation').value,
+  };
+
+// ここから先の更新処理...
+fetch(`${apiUrl}/customer/update/${customerId}`, {
+    method: 'PUT',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedCustomer),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+        if (data.success === true) {
+            alert('顧客情報が更新されました');
+                // 例えば更新後にリダイレクトするなど
+                window.location.reload();
+                } else {
+                    alert('更新に失敗しました');
+                }
+            })
+            .catch((error) => console.error(error));
+        });
+    })
+    .catch((error) => console.error(error));
+
+
+    </script>
+  </section>
+
+</body>
+</html>

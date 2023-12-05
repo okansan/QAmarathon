@@ -1,0 +1,64 @@
+<!-- registration.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顧客情報確認</title>
+    <!-- Bootstrap CSSの読み込み -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">顧客情報確認</h2>
+        <div id="confirmation-content"></div>
+        <!-- BootstrapのGrid Systemを使用 -->
+        <div class="row">
+            <div class="col-md-6">
+                <p id="confirmation-message">上記の内容でよろしければ、「保存」をクリックしてください</p>
+                <button id="save-button" class="btn btn-primary mt-3">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BootstrapのJavaScriptの読み込み -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script type="module">
+        // JavaScriptモジュールを使って、フォームから受け取ったデータを表示
+        import config from '../../config.js';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const queryParams = new URLSearchParams(window.location.search);
+            const companyName = queryParams.get('companyName');
+            const industry = queryParams.get('industry');
+            const contact = queryParams.get('contact');
+            const location = queryParams.get('location');
+
+            const confirmationContent = document.getElementById('confirmation-content');
+            confirmationContent.innerHTML = `
+                <p>会社名: ${companyName}</p>
+                <p>業種: ${industry}</p>
+                <p>連絡先: ${contact}</p>
+                <p>所在地: ${location}</p>
+            `;
+             // 保存ボタンがクリックされた時の処理
+             const saveButton = document.getElementById('save-button');
+            saveButton.addEventListener('click', function() {
+                // ローカルストレージにデータを保存
+                const customerData = {
+                    companyName,
+                    industry,
+                    contact,
+                    location
+                };
+                localStorage.setItem('customerData', JSON.stringify(customerData));
+
+                alert('顧客情報が保存されました。');
+            });
+        });
+    </script>
+</body>
+</html>

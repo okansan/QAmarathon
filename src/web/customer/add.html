@@ -31,21 +31,28 @@
         </form>
     </div>
     <script type="module">
-        import config from '../config.js';
+        import config from '../../config.js';
 
         document.getElementById('customer-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            fetch(config.apiUrl + '/add-customer', {
+            const apiUrl = 'http://localhost:3321';
+            fetch(apiUrl + '/add-customer' , {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: new URLSearchParams([...formData])
+                body: new URLSearchParams(...[formData])
+
+               
             }).then(response => response.json())
               .then(data => {
-                if(data.success) {
-                    alert('顧客情報が正常に保存されました。');
+                if(data.success === true) {
+                    window.location.href = '/customer/registration.html?companyName=' + formData.get('companyName') +
+                                            '&industry=' + formData.get('industry') +
+                                            '&contact=' + formData.get('contact') +
+                                            '&location=' + formData.get('location');
+                    // alert('顧客情報が正常に保存されました。');
                     // フォームをリセット
                     document.getElementById('customer-form').reset();
                 } else {
@@ -53,6 +60,7 @@
                 }
               })
               .catch(error => console.error('Error:', error));
+            
         });
     </script>
     <!-- BootstrapのJavaScriptの読み込み -->
