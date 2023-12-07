@@ -20,7 +20,7 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-app.get("/customer/list.html", async (req, res) => {
+app.get("/customer/list", async (req, res) => {
   try {
     const customerData = await pool.query("SELECT * FROM customers");
     res.setHeader('Content-Type','application/json');
@@ -48,9 +48,9 @@ app.post("/add-customer", async (req, res) => {
   }
 });
 
-app.get("/customer/detail.html", async (req, res) => {
+app.get("/customer/detail/:customer_id", async (req, res) => {
   try {
-    const customerId = req.query.customer_id; // クエリパラメータから customer_id を取得
+    const customerId = req.params.customer_id; // クエリパラメータから customer_id を取得
 
     const customerData = await pool.query("SELECT * FROM customers WHERE customer_id = $1", [customerId]);
     
