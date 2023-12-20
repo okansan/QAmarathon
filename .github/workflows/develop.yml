@@ -16,6 +16,4 @@ jobs:
           SSH_KEY: ${{ secrets.DEV_SSHE_SSH_KEY }}
         
       - run: ssh ${{ steps.ssh.outputs.SERVER }} bash /app/deploy_test.sh risa_kikuchi
- name: Check SSH connection
-  run: |
-    ssh -o StrictHostKeyChecking=no -o BatchMode=yes -p ${{ secrets.DEV_SSH_PORT }} ${{ secrets.DEV_SSH_USER }}@${{ secrets.DEV_SSH_HOST }} "echo 'SSH connection successful'"
+ 
