@@ -16,7 +16,3 @@ jobs:
           SSH_KEY: ${{ secrets.DEV_SSHE_SSH_KEY }}
         
       - run: ssh ${{ steps.ssh.outputs.SERVER }} bash /app/deploy_test.sh risa_kikuchi
- - name: Debug SSH key
-  run: |
-    echo "SSH Key:"
-    echo "${{ secrets.DEV_SSHE_SSH_KEY }}"
