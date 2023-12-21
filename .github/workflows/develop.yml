@@ -16,6 +16,4 @@ jobs:
           SSH_KEY: ${{ secrets.DEV_SSHE_SSH_KEY }}
 
       - run: ssh ${{ steps.ssh.outputs.SERVER }} bash /app/deploy_test.sh risa_kikuchi
-      - name: Deploy prod_config.js to Staging
-        run: |
-          scp -i ${{ secrets.DEV_SSH_KEY }} prod_config.js ${{ steps.ssh.outputs.SERVER }}:/usr/share/nginx/html/risa_kikuchi/
+  
