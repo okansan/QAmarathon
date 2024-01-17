@@ -18,7 +18,6 @@ jobs:
       - run: ssh ${{ steps.ssh.outputs.SERVER }} bash /app/deploy.sh risa_kikuchi
 
 jobs:
-  test:
     runs-on: ubuntu-latest
     steps:
     　 - id: ssh
