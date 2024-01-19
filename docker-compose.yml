@@ -1,0 +1,61 @@
+version: "3.9"
+services:
+  web:
+    container_name: nginx
+    image: "nginx:stable-bullseye"
+    ports:
+      - "80:80"
+    volumes:
+      - "./src/web:/usr/share/nginx/html"
+      - "./work:/work"
+    working_dir: /usr/share/nginx/html
+    tty: true
+  app:
+    container_name: "nodejs"
+    image: node:20-bullseye
+    ports:
+      - "3321:3321"
+    volumes:
+      - "./src/node:/app"
+      - "./work:/work"
+    working_dir: /app
+    tty: true
+    depends_on: 
+      - db
+    environment:
+      - "DB_HOST=db"
+      - "DB_PORTS=5432"
+      - "POSTGRES_USER= user_3321"
+      - "POSTGRES_DB= crm_3321"
+      - "POSTGRES_PASSWORD= pass_3321"
+
+  db:
+    container_name: "postgres"
+    image: postgres:14-alpine
+    restart: always
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+    volumes:
+      - "./db:/var/lib/postgresql/data"
+      - "./work:/work"
+    working_dir: /work
+    
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD = SCRAM-SHA-256"
+      - "POSTGRES_USER= user_3321"
+      - "POSTGRES_DB= crm_3321"
+      - "POSTGRES_PASSWORD= pass_3321"
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - 8888:80
+    volumes:
+      - "./pgadmin:/var/lib/pgadmin"
+      - "./work:/work"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: example@example.com
+      PGADMIN_DEFAULT_PASSWORD: pass
+    depends_on:
+      - db
