@@ -6,7 +6,7 @@ on:
       - main
       
 jobs:
-  test_starting:
+  test_staging:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
