@@ -26,7 +26,6 @@ jobs:
 
   deploy_production:
     runs-on: ubuntu-latest
-    needs: test_staging
     steps:
       - name: SSH into Production Server and Deploy
         id: ssh_production
